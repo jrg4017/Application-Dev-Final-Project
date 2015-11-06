@@ -42,15 +42,20 @@ public class EdgeConvertFileParser {
    public void parseEdgeFile() throws IOException {
       while ((currentLine = br.readLine()) != null) {
          currentLine = currentLine.trim();
-         if (currentLine.startsWith("Figure ")) { //this is the start of a Figure entry
+         final boolean isFigure = currentLine.startsWith("Figure ");
+         final boolean isConnector = currentLine.startsWith("Connector ");
+         if (isFigure) { //this is the start of a Figure entry
             numFigure = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Figure number
             currentLine = br.readLine().trim(); // this should be "{"
             currentLine = br.readLine().trim();
-            if (!currentLine.startsWith("Style")) { // this is to weed out other Figures, like Labels
+            final boolean isNStyle = !currentLine.startsWith("Style");
+            if (isNStyle) { // this is to weed out other Figures, like Labels
                continue;
             } else {
                style = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")); //get the Style parameter
-               if (style.startsWith("Relation")) { //presence of Relations implies lack of normalization
+               final boolean isARelation = style.startsWith("Relation");
+               final boolean isAEntity = style.startsWith("Entity");
+               if (isARelation) { //presence of Relations implies lack of normalization
                   JOptionPane.showMessageDialog(null, "The Edge Diagrammer file\n" + parseFile + "\ncontains relations.  Please resolve them and try again.");
                   EdgeConvertGUI.setReadSuccess(false);
                   break;
@@ -61,24 +66,28 @@ public class EdgeConvertFileParser {
                if (style.startsWith("Attribute")) {
                   isAttribute = true;
                }
-               if (!(isEntity || isAttribute)) { //these are the only Figures we're interested in
+               final boolean isOnlyFigure = !(isEntity || isAttribute);
+               if (isOnlyFigure) { //these are the only Figures we're interested in
                   continue;
                }
                currentLine = br.readLine().trim(); //this should be Text
                text = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")).replaceAll(" ", ""); //get the Text parameter
-               if (text.equals("")) {
+               final boolean isBlank = text.equals("");
+               if (isBlank) {
                   JOptionPane.showMessageDialog(null, "There are entities or attributes with blank names in this diagram.\nPlease provide names for them and try again.");
                   EdgeConvertGUI.setReadSuccess(false);
                   break;
                }
                int escape = text.indexOf("\\");
-               if (escape > 0) { //Edge denotes a line break as "\line", disregard anything after a backslash
+               final boolean isEAboveZero = escape > 0;
+               if (isEAboveZero) { //Edge denotes a line break as "\line", disregard anything after a backslash
                   text = text.substring(0, escape);
                }
 
                do { //advance to end of record, look for whether the text is underlined
                   currentLine = br.readLine().trim();
-                  if (currentLine.startsWith("TypeUnderl")) {
+                  final boolean isAUnderlined = currentLine.startsWith("TypeUnderl");
+                  if (isAUnderlined) {
                      isUnderlined = true;
                   }
                } while (!currentLine.equals("}")); // this is the end of a Figure entry
@@ -102,7 +111,7 @@ public class EdgeConvertFileParser {
                isUnderlined = false;
             }
          } // if("Figure")
-         if (currentLine.startsWith("Connector ")) { //this is the start of a Connector entry
+         if (isConnector) { //this is the start of a Connector entry
             numConnector = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Connector number
             currentLine = br.readLine().trim(); // this should be "{"
             currentLine = br.readLine().trim(); // not interested in Style
@@ -146,25 +155,29 @@ public class EdgeConvertFileParser {
             }
          }
          for (int tIndex = 0; tIndex < tables.length; tIndex++) { //search tables array for endpoints
-            if (endPoint1 == tables[tIndex].getNumFigure()) { //found endPoint1 in tables array
+            final boolean isEqualNF1 = endPoint1 == tables[tIndex].getNumFigure();
+            final boolean isEqualNF2 = endPoint2 == tables[tIndex].getNumFigure();
+            if (isEqualNF1) { //found endPoint1 in tables array
                connectors[cIndex].setIsEP1Table(true); //set appropriate flag
                table1Index = tIndex; //identify which element of the tables array that endPoint1 was found in
             }
-            if (endPoint2 == tables[tIndex].getNumFigure()) { //found endPoint1 in tables array
+            if (isEqualNF2) { //found endPoint1 in tables array
                connectors[cIndex].setIsEP2Table(true); //set appropriate flag
                table2Index = tIndex; //identify which element of the tables array that endPoint2 was found in
             }
          }
          
-         if (connectors[cIndex].getIsEP1Field() && connectors[cIndex].getIsEP2Field()) { //both endpoints are fields, implies lack of normalization
+         final boolean isField = connectors[cIndex].getIsEP1Field() && connectors[cIndex].getIsEP2Field();
+         final boolean isTable = connectors[cIndex].getIsEP1Table() && connectors[cIndex].getIsEP2Table();
+         if (isField) { //both endpoints are fields, implies lack of normalization
             JOptionPane.showMessageDialog(null, "The Edge Diagrammer file\n" + parseFile + "\ncontains composite attributes. Please resolve them and try again.");
             EdgeConvertGUI.setReadSuccess(false); //this tells GUI not to populate JList components
             break; //stop processing list of Connectors
          }
 
-         if (connectors[cIndex].getIsEP1Table() && connectors[cIndex].getIsEP2Table()) { //both endpoints are tables
-            if ((connectors[cIndex].getEndStyle1().indexOf("many") >= 0) &&
-                (connectors[cIndex].getEndStyle2().indexOf("many") >= 0)) { //the connector represents a many-many relationship, implies lack of normalization
+         if (isTable) { //both endpoints are tables
+            final boolean isManyR = (connectors[cIndex].getEndStyle1().indexOf("many") >= 0) && (connectors[cIndex].getEndStyle2().indexOf("many") >= 0);
+            if (isManyR) { //the connector represents a many-many relationship, implies lack of normalization
                JOptionPane.showMessageDialog(null, "There is a many-many relationship between tables\n\"" + tables[table1Index].getName() + "\" and \"" + tables[table2Index].getName() + "\"" + "\nPlease resolve this and try again.");
                EdgeConvertGUI.setReadSuccess(false); //this tells GUI not to populate JList components
                break; //stop processing list of Connectors
@@ -175,15 +188,18 @@ public class EdgeConvertFileParser {
             }
          }
          
-         if (fieldIndex >=0 && fields[fieldIndex].getTableID() == 0) { //field has not been assigned to a table yet
-            if (connectors[cIndex].getIsEP1Table()) { //endpoint1 is the table
+         final boolean nTableAssigned = fieldIndex >=0 && fields[fieldIndex].getTableID() == 0;
+         final boolean isETable1 = connectors[cIndex].getIsEP1Table();
+         final boolean isTableAssigned = fieldIndex >=0;
+         if (nTableAssigned) { //field has not been assigned to a table yet
+            if (isETable1) { //endpoint1 is the table
                tables[table1Index].addNativeField(fields[fieldIndex].getNumFigure()); //add to the appropriate table's field list
                fields[fieldIndex].setTableID(tables[table1Index].getNumFigure()); //tell the field what table it belongs to
             } else { //endpoint2 is the table
                tables[table2Index].addNativeField(fields[fieldIndex].getNumFigure()); //add to the appropriate table's field list
                fields[fieldIndex].setTableID(tables[table2Index].getNumFigure()); //tell the field what table it belongs to
             }
-         } else if (fieldIndex >=0) { //field has already been assigned to a table
+         } else if (isTableAssigned) { //field has already been assigned to a table
             JOptionPane.showMessageDialog(null, "The attribute " + fields[fieldIndex].getName() + " is connected to multiple tables.\nPlease resolve this and try again.");
             EdgeConvertGUI.setReadSuccess(false); //this tells GUI not to populate JList components
             break; //stop processing list of Connectors
@@ -197,7 +213,8 @@ public class EdgeConvertFileParser {
       EdgeField tempField;
       currentLine = br.readLine();
       currentLine = br.readLine(); //this should be "Table: "
-      while (currentLine.startsWith("Table: ")) {
+      final boolean isTable = currentLine.startsWith("Table: ");
+      while (isTable) {
          numFigure = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Table number
          currentLine = br.readLine(); //this should be "{"
          currentLine = br.readLine(); //this should be "TableName"
@@ -232,7 +249,8 @@ public class EdgeConvertFileParser {
          currentLine = br.readLine(); //this should be "\n"
          currentLine = br.readLine(); //this should be either the next "Table: ", #Fields#
       }
-      while ((currentLine = br.readLine()) != null) {
+      final boolean isNotNull = (currentLine = br.readLine()) != null;
+      while (isNotNull) {
          stField = new StringTokenizer(currentLine, DELIM);
          numFigure = Integer.parseInt(stField.nextToken());
          fieldName = stField.nextToken();
@@ -252,13 +270,16 @@ public class EdgeConvertFileParser {
    } // parseSaveFile()
 
    private void makeArrays() { //convert ArrayList objects into arrays of the appropriate Class type
-      if (alTables != null) {
+      final boolean isNotNullTable = alTables != null;
+      final boolean isNotNullField = alFields != null;
+      final boolean isNotNullConnector = alConnectors != null;
+      if (isNotNullTable) {
          tables = (EdgeTable[])alTables.toArray(new EdgeTable[alTables.size()]);
       }
-      if (alFields != null) {
+      if (isNotNullField) {
          fields = (EdgeField[])alFields.toArray(new EdgeField[alFields.size()]);
       }
-      if (alConnectors != null) {
+      if (isNotNullConnector) {
          connectors = (EdgeConnector[])alConnectors.toArray(new EdgeConnector[alConnectors.size()]);
       }
    }
@@ -266,7 +287,8 @@ public class EdgeConvertFileParser {
    private boolean isTableDup(String testTableName) {
       for (int i = 0; i < alTables.size(); i++) {
          EdgeTable tempTable = (EdgeTable)alTables.get(i);
-         if (tempTable.getName().equals(testTableName)) {
+         final boolean isDuplicate = tempTable.getName().equals(testTableName);
+         if (isDuplicate) {
             return true;
          }
       }
@@ -288,13 +310,15 @@ public class EdgeConvertFileParser {
          //test for what kind of file we have
          currentLine = br.readLine().trim();
          numLine++;
-         if (currentLine.startsWith(EDGE_ID)) { //the file chosen is an Edge Diagrammer file
+        final boolean isEdgeID = currentLine.startsWith(EDGE_ID);
+        final boolean isSaveID = currentLine.startsWith(SAVE_ID);
+         if (isEdgeID) { //the file chosen is an Edge Diagrammer file
             this.parseEdgeFile(); //parse the file
             br.close();
             this.makeArrays(); //convert ArrayList objects into arrays of the appropriate Class type
             this.resolveConnectors(); //Identify nature of Connector endpoints
          } else {
-            if (currentLine.startsWith(SAVE_ID)) { //the file chosen is a Save file created by this application
+            if (isSaveID) { //the file chosen is a Save file created by this application
                this.parseSaveFile(); //parse the file
                br.close();
                this.makeArrays(); //convert ArrayList objects into arrays of the appropriate Class type
