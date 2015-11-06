@@ -33,12 +33,14 @@ public abstract class EdgeConvertCreateDDL {
          int numBound = 0; //initialize counter for number of bound tables
          int[] relatedFields = tables[i].getRelatedFieldsArray();
          for (int j = 0; j < relatedFields.length; j++) { //step through related fields list
-            if (relatedFields[j] != 0) {
+            final boolean isNonZeroRF = relatedFields[j] != 0;
+            if (isNonZeroRF) {
                numBound++; //count the number of non-zero related fields
             }
          }
+         final boolean numBoundHigher = numBound > maxBound;
          numBoundTables[i] = numBound;
-         if (numBound > maxBound) {
+         if (numBoundHigher) {
             maxBound = numBound;
          }
       }
@@ -46,7 +48,8 @@ public abstract class EdgeConvertCreateDDL {
    
    protected EdgeTable getTable(int numFigure) {
       for (int tIndex = 0; tIndex < tables.length; tIndex++) {
-         if (numFigure == tables[tIndex].getNumFigure()) {
+         final boolean isEqualNFt = numFigure == tables[tIndex].getNumFigure();
+         if (isEqualNFt) {
             return tables[tIndex];
          }
       }
@@ -55,7 +58,8 @@ public abstract class EdgeConvertCreateDDL {
    
    protected EdgeField getField(int numFigure) {
       for (int fIndex = 0; fIndex < fields.length; fIndex++) {
-         if (numFigure == fields[fIndex].getNumFigure()) {
+         final boolean isEqualNFf = numFigure == fields[fIndex].getNumFigure();
+         if (isEqualNFf) {
             return fields[fIndex];
          }
       }
