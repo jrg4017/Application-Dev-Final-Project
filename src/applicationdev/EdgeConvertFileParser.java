@@ -364,4 +364,4 @@ public class EdgeConvertFileParser {
       } // catch IOException
    } //end openFile
    
-} //end EdgeConvertFileHandler
+} // EdgeConvertFileHandler
