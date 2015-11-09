@@ -162,11 +162,14 @@ public class EdgeConvertFileParser {
          endPoint2 = connectors[cIndex].getEndPoint2();
          fieldIndex = -1;
          for (int fIndex = 0; fIndex < fields.length; fIndex++) { //search fields array for endpoints
-            if (endPoint1 == fields[fIndex].getNumFigure()) { //found endPoint1 in fields array
+          //Simplifying a complex expression
+         final boolean isEqualF1 = endPoint1 == fields[fIndex].getNumFigure();
+         final boolean isEqualF2 = endPoint2 == fields[fIndex].getNumFigure();
+            if (isEqualF1) { //found endPoint1 in fields array
                connectors[cIndex].setIsEP1Field(true); //set appropriate flag
                fieldIndex = fIndex; //identify which element of the fields array that endPoint1 was found in
             }
-            if (endPoint2 == fields[fIndex].getNumFigure()) { //found endPoint2 in fields array
+            if (isEqualF2) { //found endPoint2 in fields array
                connectors[cIndex].setIsEP2Field(true); //set appropriate flag
                fieldIndex = fIndex; //identify which element of the fields array that endPoint2 was found in
             }
