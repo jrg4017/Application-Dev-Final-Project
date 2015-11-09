@@ -6,30 +6,70 @@ import java.io.*;
 import java.util.*;
 
 public class CreateDDLMySQL extends EdgeConvertCreateDDL {
-
-   protected String databaseName;
-   //this array is for determining how MySQL refers to datatypes
-   protected String[] strDataType = {"VARCHAR", "BOOL", "INT", "DOUBLE"};
-   protected StringBuffer sb;
-
+/*********************************************************************/
+/********* ATTRIBUTES ************************************************/
+   protected String databaseName;                                            //the name of databases
+   protected String[] strDataType = {"VARCHAR", "BOOL", "INT", "DOUBLE"};    //this array is for determining how MySQL refers to datatypes
+   protected StringBuffer sb;											     //
+/*********************************************************************/
+/********* CONSTRUCTORS **********************************************/
+   /**
+   * default constructor with empty arg list for to allow output dir to be set before there are table and field objectss
+   */
+   public CreateDDLMySQL() { } //end default constructor
+   
+   /**
+   * constructor 
+   * @param inputTables EdgeTable[]
+   * @param inputFields EdgeTable[]
+   */
    public CreateDDLMySQL(EdgeTable[] inputTables, EdgeField[] inputFields) {
-      super(inputTables, inputFields);
-      sb = new StringBuffer();
-   } //CreateDDLMySQL(EdgeTable[], EdgeField[])
+      super(inputTables, inputFields); //call EdgeConvert supers
+      this.sb = new StringBuffer();
+   } //end CreateDDLMySQL
    
-   public CreateDDLMySQL() { //default constructor with empty arg list for to allow output dir to be set before there are table and field objects
-      
-   }
+/*********************************************************************/
+/********* ACCESSORS *************************************************/   
+   /**
+   * gets the database name
+   * @return databaseName
+   */
+   public String getDatabaseName() {
+      return databaseName;
+   }//end getDatabaseName
    
+   /**
+   * gets the product name
+   * @return string
+   */
+   public String getProductName() {
+      return "MySQL"; 
+   }//end getProductName
+
+   /**
+   * creates the DDL & then get the SQL string generated
+   * @return string
+   */
+   public String getSQLString() {
+      createDDL();
+      return this.sb.toString();
+   }//end getSQLString
+ 
+/*********************************************************************/
+/********* METHODS ***************************************************/
+
+   /**
+   * creates the DDL (data description language) for the program
+   */
    public void createDDL() {
       EdgeConvertGUI.setReadSuccess(true);
       databaseName = generateDatabaseName();
-      sb.append("CREATE DATABASE " + databaseName + ";\r\n");
-      sb.append("USE " + databaseName + ";\r\n");
+      this.sb.append("CREATE DATABASE " + databaseName + ";\r\n");
+      this.sb.append("USE " + databaseName + ";\r\n");
       for (int boundCount = 0; boundCount <= maxBound; boundCount++) { //process tables in order from least dependent (least number of bound tables) to most dependent
          for (int tableCount = 0; tableCount < numBoundTables.length; tableCount++) { //step through list of tables
             if (numBoundTables[tableCount] == boundCount) { //
-               sb.append("CREATE TABLE " + tables[tableCount].getName() + " (\r\n");
+               this.sb.append("CREATE TABLE " + tables[tableCount].getName() + " (\r\n");
                int[] nativeFields = tables[tableCount].getNativeFieldsArray();
                int[] relatedFields = tables[tableCount].getRelatedFieldsArray();
                boolean[] primaryKey = new boolean[nativeFields.length];
@@ -37,18 +77,18 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
                int numForeignKey = 0;
                for (int nativeFieldCount = 0; nativeFieldCount < nativeFields.length; nativeFieldCount++) { //print out the fields
                   EdgeField currentField = getField(nativeFields[nativeFieldCount]);
-                  sb.append("\t" + currentField.getName() + " " + strDataType[currentField.getDataType()]);
+                  this.sb.append("\t" + currentField.getName() + " " + strDataType[currentField.getDataType()]);
                   if (currentField.getDataType() == 0) { //varchar
-                     sb.append("(" + currentField.getVarcharValue() + ")"); //append varchar length in () if data type is varchar
+                     this.sb.append("(" + currentField.getVarcharValue() + ")"); //append varchar length in () if data type is varchar
                   }
                   if (currentField.getDisallowNull()) {
-                     sb.append(" NOT NULL");
+                     this.sb.append(" NOT NULL");
                   }
                   if (!currentField.getDefaultValue().equals("")) {
                      if (currentField.getDataType() == 1) { //boolean data type
-                        sb.append(" DEFAULT " + convertStrBooleanToInt(currentField.getDefaultValue()));
+                        this.sb.append(" DEFAULT " + convertStrBooleanToInt(currentField.getDefaultValue()));
                      } else { //any other data type
-                        sb.append(" DEFAULT " + currentField.getDefaultValue());
+                        this.sb.append(" DEFAULT " + currentField.getDefaultValue());
                      }
                   }
                   if (currentField.getIsPrimaryKey()) {
@@ -60,59 +100,67 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
                   if (currentField.getFieldBound() != 0) {
                      numForeignKey++;
                   }
-                  sb.append(",\r\n"); //end of field
+                  this.sb.append(",\r\n"); //end of field
                }
                if (numPrimaryKey > 0) { //table has primary key(s)
-                  sb.append("CONSTRAINT " + tables[tableCount].getName() + "_PK PRIMARY KEY (");
+                  this.sb.append("CONSTRAINT " + tables[tableCount].getName() + "_PK PRIMARY KEY (");
                   for (int i = 0; i < primaryKey.length; i++) {
                      if (primaryKey[i]) {
-                        sb.append(getField(nativeFields[i]).getName());
+                        this.sb.append(getField(nativeFields[i]).getName());
                         numPrimaryKey--;
                         if (numPrimaryKey > 0) {
-                           sb.append(", ");
+                           this.sb.append(", ");
                         }
                      }
                   }
-                  sb.append(")");
+                  this.sb.append(")");
                   if (numForeignKey > 0) {
-                     sb.append(",");
+                     this.sb.append(",");
                   }
-                  sb.append("\r\n");
+                  this.sb.append("\r\n");
                }
                if (numForeignKey > 0) { //table has foreign keys
                   int currentFK = 1;
                   for (int i = 0; i < relatedFields.length; i++) {
                      if (relatedFields[i] != 0) {
-                        sb.append("CONSTRAINT " + tables[tableCount].getName() + "_FK" + currentFK +
+                        this.sb.append("CONSTRAINT " + tables[tableCount].getName() + "_FK" + currentFK +
                                   " FOREIGN KEY(" + getField(nativeFields[i]).getName() + ") REFERENCES " +
                                   getTable(getField(nativeFields[i]).getTableBound()).getName() + "(" + getField(relatedFields[i]).getName() + ")");
                         if (currentFK < numForeignKey) {
-                           sb.append(",\r\n");
+                           this.sb.append(",\r\n");
                         }
                         currentFK++;
                      }
                   }
-                  sb.append("\r\n");
+                  this.sb.append("\r\n");
                }
-               sb.append(");\r\n\r\n"); //end of table
+               this.sb.append(");\r\n\r\n"); //end of table
             }
          }
       }
-   }
-
-   protected int convertStrBooleanToInt(String input) { //MySQL uses '1' and '0' for boolean types
+   }//end createDDL
+   
+	/**
+	* converts a String boolean used in MySQL to an int
+	* MySQL uses '1' and '0' for boolean types
+	* @return int 
+	*/
+    protected int convertStrBooleanToInt(String input) { 
       if (input.equals("true")) {
          return 1;
       } else {
          return 0;
       }
-   }
+    }//end convertStrBooleanToInt
    
-   public String generateDatabaseName() { //prompts user for database name
-      String dbNameDefault = "MySQLDB";
-      //String databaseName = "";
-
-      do {
+   /**
+   * generates the database name by prompting user for the name
+   * @return databaseName String 
+   */
+   public String generateDatabaseName() { 
+      String dbNameDefault = "MySQLDB"; //default for databaseName
+	  
+      do { //asks for the database name
          databaseName = (String)JOptionPane.showInputDialog(
                        null,
                        "Enter the database name:",
@@ -130,19 +178,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
          }
       } while (databaseName.equals(""));
       return databaseName;
-   }
+   }//end generateDatabaseName
    
-   public String getDatabaseName() {
-      return databaseName;
-   }
    
-   public String getProductName() {
-      return "MySQL";
-   }
-
-   public String getSQLString() {
-      createDDL();
-      return sb.toString();
-   }
-   
-}//EdgeConvertCreateDDL
+}//end EdgeConvertCreateDDL
