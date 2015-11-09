@@ -63,7 +63,6 @@ public abstract class EdgeConvertCreateDDL {
       }
       return null;
    }//end getField
-
 /*********************************************************************/
 /********* METHODS ***************************************************/
    /**
@@ -89,9 +88,7 @@ public abstract class EdgeConvertCreateDDL {
             this.maxBound = numBound;
          }
       }
-   }//end initialize
-   
- 
+   }//end initialize 
 /*********************************************************************/
 /********* ABSTRACT METHODS ******************************************/
 

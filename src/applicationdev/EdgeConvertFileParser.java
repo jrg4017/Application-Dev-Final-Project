@@ -3,42 +3,55 @@ import java.util.*;
 import javax.swing.*;
 
 public class EdgeConvertFileParser {
-   //private String filename = "test.edg";
-   private File parseFile;
-   private FileReader fr;
-   private BufferedReader br;
-   private String currentLine;
-   private ArrayList alTables, alFields, alConnectors;
-   private EdgeTable[] tables;
-   private EdgeField[] fields;
-   private EdgeField tempField;
-   private EdgeConnector[] connectors;
-   private String style;
-   private String text;
-   private String tableName;
-   private String fieldName;
-   private boolean isEntity, isAttribute, isUnderlined = false;
-   private int numFigure, numConnector, numFields, numTables, numNativeRelatedFields;
-   private int endPoint1, endPoint2;
-   private int numLine;
-   private String endStyle1, endStyle2;
-   public static final String EDGE_ID = "EDGE Diagram File"; //first line of .edg files should be this
-   public static final String SAVE_ID = "EdgeConvert Save File"; //first line of save files should be this
-   public static final String DELIM = "|";
-   
+	//TODO are any of these local varaiables? Can we make them local?? --> better code
+/*********************************************************************/
+/********* ATTRIBUTES ************************************************/
+   private File parseFile;											 //
+   private FileReader fr;											 //
+   private BufferedReader br;										 //
+   private String currentLine;										 //
+   private ArrayList alTables = new ArrayList(), alFields = new ArrayList(), alConnectors = new ArrayList();//when object is constructed, default
+   private EdgeTable[] tables;										                  //
+   private EdgeField[] fields;										 				  //
+   private EdgeField tempField;										 				  //	
+   private EdgeConnector[] connectors;												  //
+   private String style, text, tableName, fieldName, endStyle1, endStyle2;            //
+   private boolean isEntity = false, isAttribute =false,  isUnderlined = false;       // all set to false when object is created 
+   private int numFigure = 0, numConnector = 0, numLine = 0;						  // all set to zero as default when object is constructed
+   private int endPoint1, endPoint2, numFields, numTables, numNativeRelatedFields;    //
+/*************************************************************************************/
+/********* CONSTANTS *****************************************************************/  
+   public static final String EDGE_ID = "EDGE Diagram File"; 						  //first line of .edg files should be this
+   public static final String SAVE_ID = "EdgeConvert Save File"; 					  //first line of save files should be this
+   public static final String DELIM = "|";										      //separator
+/*********************************************************************/
+/********* CONSTRUCTORS **********************************************/   
+   /**
+   * accepts a file, sets it to parseFile and opens the file
+   */
    public EdgeConvertFileParser(File constructorFile) {
-      numFigure = 0;
-      numConnector = 0;
-      alTables = new ArrayList();
-      alFields = new ArrayList();
-      alConnectors = new ArrayList();
-      isEntity = false;
-      isAttribute = false;
-      parseFile = constructorFile;
-      numLine = 0;
+      this.parseFile = constructorFile; 
       this.openFile(parseFile);
-   }
-
+   }//end EdgeConvertFileParser
+/*********************************************************************/
+/********* ACCESSORS *************************************************/
+	/**
+   * gets the Edge Tables
+   * @return this.tables EdgeTable */
+   public EdgeTable[] getEdgeTables() {  return this.tables;  }
+   
+   /**
+   * gets the EdgeFields 
+   * @return this.field EdgeField */
+   public EdgeField[] getEdgeFields() { return this.fields;  }
+   
+/*********************************************************************/
+/********* METHODS ***************************************************/
+   /**
+   * parses through the Edge file
+   * @throw IOException
+   */
+   //TODO refactor into smaller functions!
    public void parseEdgeFile() throws IOException {
       while ((currentLine = br.readLine()) != null) {
          currentLine = currentLine.trim();
@@ -135,9 +148,13 @@ public class EdgeConvertFileParser {
             alConnectors.add(new EdgeConnector(numConnector + DELIM + endPoint1 + DELIM + endPoint2 + DELIM + endStyle1 + DELIM + endStyle2));
          } // if("Connector")
       } // while()
-   } // parseEdgeFile()
+   } //end parseEdgeFile()
    
-   private void resolveConnectors() { //Identify nature of Connector endpoints
+   /**
+   * identify nature of Connector endpoints
+   */
+   //TODO refactor into smaller reusable functions
+   private void resolveConnectors() { 
       int endPoint1, endPoint2;
       int fieldIndex = 0, table1Index = 0, table2Index = 0;
       for (int cIndex = 0; cIndex < connectors.length; cIndex++) {
@@ -205,9 +222,14 @@ public class EdgeConvertFileParser {
             break; //stop processing list of Connectors
          }
       } // connectors for() loop
-   } // resolveConnectors()
+   } //end resolveConnectors
    
-   public void parseSaveFile() throws IOException { //this method is fucked
+   /**
+   * parse the save file of the edge 
+   * @throws IOException
+   */
+   //TODO clean up code, refactor, fix "shoulds" into "does"
+   public void parseSaveFile() throws IOException { 
       StringTokenizer stTables, stNatFields, stRelFields, stNatRelFields, stField;
       EdgeTable tempTable;
       EdgeField tempField;
@@ -267,9 +289,13 @@ public class EdgeConvertFileParser {
          }
          alFields.add(tempField);
       }
-   } // parseSaveFile()
+   } // end parseSaveFile
 
-   private void makeArrays() { //convert ArrayList objects into arrays of the appropriate Class type
+   /**
+   * convert ArrayList objects into arrays of the appropriate Class type
+   */
+   private void makeArrays() { 
+	//TODO clean the finals up!! messy and improper code
       final boolean isNotNullTable = alTables != null;
       final boolean isNotNullField = alFields != null;
       final boolean isNotNullConnector = alConnectors != null;
@@ -282,8 +308,13 @@ public class EdgeConvertFileParser {
       if (isNotNullConnector) {
          connectors = (EdgeConnector[])alConnectors.toArray(new EdgeConnector[alConnectors.size()]);
       }
-   }
+   }//end makeArray
    
+   /**
+   * see if this is a duplicate table
+   * @param testTableName String - name of table to test
+   * @return boolean
+   */
    private boolean isTableDup(String testTableName) {
       for (int i = 0; i < alTables.size(); i++) {
          EdgeTable tempTable = (EdgeTable)alTables.get(i);
@@ -293,16 +324,12 @@ public class EdgeConvertFileParser {
          }
       }
       return false;
-   }
+   }//end isTableDup
    
-   public EdgeTable[] getEdgeTables() {
-      return tables;
-   }
-   
-   public EdgeField[] getEdgeFields() {
-      return fields;
-   }
-   
+   /**
+   * opens the file passed into the constructor
+   * @param inputFile File
+   */
    public void openFile(File inputFile) {
       try {
          fr = new FileReader(inputFile);
@@ -335,5 +362,6 @@ public class EdgeConvertFileParser {
          System.out.println(ioe);
          System.exit(0);
       } // catch IOException
-   } // openFile()
-} // EdgeConvertFileHandler
+   } //end openFile
+   
+} //end EdgeConvertFileHandler
