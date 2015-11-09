@@ -1030,14 +1030,21 @@ public class EdgeConvertGUI {
       jmiDROptionsShowProducts.setEnabled(true);
    }// end setOutputDir 
    
+   /**
+   * displays the product name 
+   * @return String sb
+   */
    private String displayProductNames() {
       StringBuffer sb = new StringBuffer();
       for (int i = 0; i < productNames.length; i++) {
          sb.append(productNames[i] + "\n");
       }
       return sb.toString();
-   }
+   }//end displayProductNames
    
+   /**
+   * gets all of the output classes
+   */
    private void getOutputClasses() {
       File[] resultFiles;
       Class resultClass = null;
@@ -1085,8 +1092,12 @@ public class EdgeConvertGUI {
          productNames = (String[])alProductNames.toArray(new String[alProductNames.size()]);
          objSubclasses = (Object[])alSubclasses.toArray(new Object[alSubclasses.size()]);
       }
-   }
+   }//end getOutputClasses
    
+   /**
+   * gets the SQL statements
+   * @return String
+   */
    private String getSQLStatements() {
       String strSQLString = "";
       String response = (String)JOptionPane.showInputDialog(
@@ -1124,8 +1135,11 @@ public class EdgeConvertGUI {
       }
 
       return strSQLString;
-   }
-
+   }//end getSQLStatements
+	/**
+	* writes the SQL statements to file
+	* @param output String
+	*/
    private void writeSQL(String output) {
       jfcEdge.resetChoosableFileFilters();
       String str;
@@ -1158,10 +1172,15 @@ public class EdgeConvertGUI {
             System.out.println(ioe);
          }
       }
-   }
+   }//end 
    
+   //TODO extract class into a new files
    class EdgeRadioButtonListener implements ActionListener {
-      public void actionPerformed(ActionEvent ae) {
+      /**
+	  * @param ae ActionEvent
+	  * @Override
+	  */
+	  public void actionPerformed(ActionEvent ae) {
          for (int i = 0; i < jrbDataType.length; i++) {
             if (jrbDataType[i].isSelected()) {
                currentDTField.setDataType(i);
@@ -1178,9 +1197,10 @@ public class EdgeConvertGUI {
          jtfDTDefaultValue.setText("");
          currentDTField.setDefaultValue("");
          dataSaved = false;
-      }
-   }
+      }//end actionPerformed
+   }//end EdgeRadioButtonListener
    
+   //TODO extract class
    class EdgeWindowListener implements WindowListener {
       public void windowActivated(WindowEvent we) {}
       public void windowClosed(WindowEvent we) {}
