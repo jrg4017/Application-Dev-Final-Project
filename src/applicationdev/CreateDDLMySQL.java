@@ -32,19 +32,15 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
 /********* ACCESSORS *************************************************/   
    /**
    * gets the database name
-   * @return databaseName
+   * @return this.databaseName
    */
-   public String getDatabaseName() {
-      return databaseName;
-   }//end getDatabaseName
+   public String getDatabaseName() { return this.databaseName;  }//end getDatabaseName
    
    /**
    * gets the product name
    * @return string
    */
-   public String getProductName() {
-      return "MySQL"; 
-   }//end getProductName
+   public String getProductName() {  return "MySQL";  }//end getProductName
 
    /**
    * creates the DDL & then get the SQL string generated
@@ -61,11 +57,12 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
    /**
    * creates the DDL (data description language) for the program
    */
+   //TODO REFACTOR THIS! Function to long, needs to divy up into smaller reusable code
    public void createDDL() {
       EdgeConvertGUI.setReadSuccess(true);
-      databaseName = generateDatabaseName();
-      this.sb.append("CREATE DATABASE " + databaseName + ";\r\n");
-      this.sb.append("USE " + databaseName + ";\r\n");
+      this.databaseName = generateDatabaseName();
+      this.sb.append("CREATE DATABASE " + this.databaseName + ";\r\n");
+      this.sb.append("USE " + this.databaseName + ";\r\n");
       for (int boundCount = 0; boundCount <= maxBound; boundCount++) { //process tables in order from least dependent (least number of bound tables) to most dependent
          for (int tableCount = 0; tableCount < numBoundTables.length; tableCount++) { //step through list of tables
             if (numBoundTables[tableCount] == boundCount) { //
@@ -143,8 +140,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
 	/**
 	* converts a String boolean used in MySQL to an int
 	* MySQL uses '1' and '0' for boolean types
-	* @return int 
-	*/
+	* @return int  */
     protected int convertStrBooleanToInt(String input) { 
       if (input.equals("true")) {
          return 1;
@@ -155,13 +151,13 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
    
    /**
    * generates the database name by prompting user for the name
-   * @return databaseName String 
+   * @return this.databaseName String 
    */
    public String generateDatabaseName() { 
-      String dbNameDefault = "MySQLDB"; //default for databaseName
+      String dbNameDefault = "MySQLDB"; //default for this.databaseName
 	  
       do { //asks for the database name
-         databaseName = (String)JOptionPane.showInputDialog(
+         this.databaseName = (String)JOptionPane.showInputDialog(
                        null,
                        "Enter the database name:",
                        "Database Name",
@@ -169,15 +165,15 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
                        null,
                        null,
                        dbNameDefault);
-         if (databaseName == null) {
+         if (this.databaseName == null) {
             EdgeConvertGUI.setReadSuccess(false);
             return "";
          }
-         if (databaseName.equals("")) {
+         if (this.databaseName.equals("")) {
             JOptionPane.showMessageDialog(null, "You must select a name for your database.");
          }
-      } while (databaseName.equals(""));
-      return databaseName;
+      } while (this.databaseName.equals(""));
+      return this.databaseName;
    }//end generateDatabaseName
    
    

@@ -5,10 +5,7 @@
  */
 package applicationdev;
 
-/**
- *
- * @author Chevy
- */
+
 public class ApplicationDev {
 
     /**
@@ -16,6 +13,6 @@ public class ApplicationDev {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-    }
+    }//end main
     
 }
