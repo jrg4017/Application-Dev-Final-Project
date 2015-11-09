@@ -6,65 +6,94 @@ import java.io.*;
 import java.util.*;
 
 public abstract class EdgeConvertCreateDDL {
-   static String[] products = {"MySQL"};
-   protected EdgeTable[] tables; //master copy of EdgeTable objects
-   protected EdgeField[] fields; //master copy of EdgeField objects
-   protected int[] numBoundTables;
-   protected int maxBound;
-   protected StringBuffer sb;
-   protected int selected;
-   
+/*********************************************************************/
+/********* ATTRIBUTES ************************************************/
+   static String[] products = {"MySQL"};							  //	
+   protected EdgeTable[] tables; 									  //master copy of EdgeTable objects
+   protected EdgeField[] fields; 									  //master copy of EdgeField objects
+   protected int[] numBoundTables;									  //
+   protected int maxBound;											  //
+   protected StringBuffer sb;										  //
+   protected int selected;											  //
+/*********************************************************************/
+/********* CONSTRUCTORS **********************************************/  
+   /**
+   * sets the tables and fields of database to convert in class
+   * @param tables EdgeTable
+   * @param fields EdgeField
+   */
    public EdgeConvertCreateDDL(EdgeTable[] tables, EdgeField[] fields) {
       this.tables = tables;
       this.fields = fields;
       initialize();
-   } //EdgeConvertCreateDDL(EdgeTable[], EdgeField[])
+   } //end EdgeConvertCreateDDL
    
-   public EdgeConvertCreateDDL() { //default constructor with empty arg list for to allow output dir to be set before there are table and field objects
-      
-   } //EdgeConvertCreateDDL()
+   /**
+   * default constructor with empty arg list for to allow output dir 
+   * to be set before there are table and field objects
+   */
+   public EdgeConvertCreateDDL() { } //EdgeConvertCreateDDL()
+/*********************************************************************/
+/********* ACCESSORS *************************************************/
+  /**
+   * gets the table at the requested numFigure
+   * @param numFigure int
+   * @return EdgeTable
+   */
+   protected EdgeTable getTable(int numFigure) {
+      for (int tIndex = 0; tIndex < this.tables.length; tIndex++) {
+         final boolean isEqualNFt = numFigure == this.tables[tIndex].getNumFigure();
+         if (isEqualNFt) {
+            return this.tables[tIndex];
+         }
+      }
+      return null;
+   }//end getTable
+   /**
+   * gets the field at the requested numFigure
+   * @param numFigure int
+   * @return EdgeField
+   */
+   protected EdgeField getField(int numFigure) {
+      for (int fIndex = 0; fIndex < this.fields.length; fIndex++) {
+         final boolean isEqualNFf = numFigure == this.fields[fIndex].getNumFigure();
+         if (isEqualNFf) {
+            return this.fields[fIndex];
+         }
+      }
+      return null;
+   }//end getField
 
+/*********************************************************************/
+/********* METHODS ***************************************************/
+   /**
+   * initalizes the 
+   */
    public void initialize() {
-      numBoundTables = new int[tables.length];
-      maxBound = 0;
-      sb = new StringBuffer();
+      this.numBoundTables = new int[this.tables.length];
+      this.maxBound = 0;
+      this.sb = new StringBuffer();
 
-      for (int i = 0; i < tables.length; i++) { //step through list of tables
+      for (int i = 0; i < this.tables.length; i++) { //step through list of tables
          int numBound = 0; //initialize counter for number of bound tables
-         int[] relatedFields = tables[i].getRelatedFieldsArray();
+         int[] relatedFields = this.tables[i].getRelatedFieldsArray();
          for (int j = 0; j < relatedFields.length; j++) { //step through related fields list
             final boolean isNonZeroRF = relatedFields[j] != 0;
             if (isNonZeroRF) {
                numBound++; //count the number of non-zero related fields
             }
          }
-         final boolean numBoundHigher = numBound > maxBound;
-         numBoundTables[i] = numBound;
+         final boolean numBoundHigher = numBound > this.maxBound;
+         this.numBoundTables[i] = numBound;
          if (numBoundHigher) {
-            maxBound = numBound;
+            this.maxBound = numBound;
          }
       }
-   }
+   }//end initialize
    
-   protected EdgeTable getTable(int numFigure) {
-      for (int tIndex = 0; tIndex < tables.length; tIndex++) {
-         final boolean isEqualNFt = numFigure == tables[tIndex].getNumFigure();
-         if (isEqualNFt) {
-            return tables[tIndex];
-         }
-      }
-      return null;
-   }
-   
-   protected EdgeField getField(int numFigure) {
-      for (int fIndex = 0; fIndex < fields.length; fIndex++) {
-         final boolean isEqualNFf = numFigure == fields[fIndex].getNumFigure();
-         if (isEqualNFf) {
-            return fields[fIndex];
-         }
-      }
-      return null;
-   }
+ 
+/*********************************************************************/
+/********* ABSTRACT METHODS ******************************************/
 
    public abstract String getDatabaseName();
 

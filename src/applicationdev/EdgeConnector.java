@@ -6,7 +6,6 @@ public class EdgeConnector {
    private int numConnector, endPoint1, endPoint2;					 //
    private String endStyle1, endStyle2;                              //
    private boolean isEP1Field, isEP2Field, isEP1Table, isEP2Table;   //
-
 /*********************************************************************/
 /********* CONSTRUCTORS **********************************************/
 	/**
@@ -26,7 +25,7 @@ public class EdgeConnector {
       this.isEP2Field = false;
       this.isEP1Table = false;
       this.isEP2Table = false;
-   }//end EdgeConnector
+   }//end EdgeConnector  
    
 /*********************************************************************/
 /********* ACCESSORS *************************************************/      
@@ -74,7 +73,7 @@ public class EdgeConnector {
    * gets the isEP2Table
    * @return this.isEP2Table boolean */
    public boolean getIsEP2Table() {  return isEP2Table;  }//end getIsEP2Table
-   
+  
 /*********************************************************************/
 /********* MUTATORS **************************************************/ 
    /**
