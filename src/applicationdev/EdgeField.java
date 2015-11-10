@@ -77,7 +77,7 @@ public class EdgeField {
    * @return this.strDataType String[]
    */
    public static String[] getStrDataType() {
-      return this.strDataType;
+      return strDataType;
    }//end getStrDataType
 /*********************************************************************/
 /********* MUTATORS **************************************************/   
