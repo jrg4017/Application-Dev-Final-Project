@@ -12,7 +12,7 @@ public class ApplicationDev {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        RunEdgeConvert rec = new RunEdgeConvert();
     }//end main
     
 }
