@@ -39,10 +39,8 @@
 
 
 import java.io.File;
-import java.util.Hashtable;
 import java.util.Enumeration;
-import javax.swing.*;
-import javax.swing.filechooser.*;
+import java.util.Hashtable;
 
 /**
  * A convenience implementation of FileFilter that filters out

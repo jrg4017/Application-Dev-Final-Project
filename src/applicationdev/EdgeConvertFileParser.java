@@ -1,7 +1,3 @@
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
-
 public class EdgeConvertFileParser {
 	//TODO are any of these local varaiables? Can we make them local?? --> better code
 /*********************************************************************/
