@@ -1,4 +1,6 @@
-public class EdgeTable {
+import java.util.*;
+
+ class EdgeTable {
 /*********************************************************************/
 /********* ATTRIBUTES ************************************************/
    private int numFigure;
