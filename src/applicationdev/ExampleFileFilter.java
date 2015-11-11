@@ -38,6 +38,8 @@
  */
 
 
+import javax.swing.*;
+import javax.swing.filechooser.*;
 import java.io.File;
 import java.util.Enumeration;
 import java.util.Hashtable;
