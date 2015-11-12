@@ -29,7 +29,7 @@ import java.util.*;
    * @return this.name String */
    public String getName() { return name; }//end getName
    /**
-   * gets all of the realted tables from the array list
+   * gets all of the related tables from the array list
    * @return this.relatedTables int[] */
    public int[] getRelatedTablesArray() { return this.relatedTables; }//end getRelatedTablesArray
    /**
@@ -62,12 +62,13 @@ import java.util.*;
    */
    public void addNativeField(int value) { this.alNativeFields.add(new Integer(value)); }//end addNativeField
 	
-	/**
-	* moves the field closer to the beginning of the list
-	* @param index int
-	*/
-   public void moveFieldUp(int index) {  
-      if (index == 0) {
+   /**
+   * Moves the field closer to the beginning of the list
+   * @param index int
+   */
+   public void moveFieldUp(int index) {
+      final boolean isIndexZero = index == 0;
+      if (isIndexZero) {
          return;
       }
       int tempNative = this.nativeFields[index - 1]; //save element at destination index
@@ -79,11 +80,12 @@ import java.util.*;
    }//end moveFieldUp
    
    /**
-   * move the field closer to the end of the list
+   * Move the field closer to the end of the list
    * @param index int
    */
-   public void moveFieldDown(int index) { 
-      if (index == (this.nativeFields.length - 1)) {
+   public void moveFieldDown(int index) {
+      final boolean isEqualNF = index == (this.nativeFields.length - 1);
+      if (isEqualNF) {
          return;
       }
       int tempNative = this.nativeFields[index + 1]; //save element at destination index
@@ -128,22 +130,25 @@ import java.util.*;
       sb.append("TableName: " + name + "\r\n");
       sb.append("NativeFields: ");
       for (int i = 0; i < this.nativeFields.length; i++) {
+         final boolean isBelowNF = i < (this.nativeFields.length - 1);
          sb.append(this.nativeFields[i]);
-         if (i < (this.nativeFields.length - 1)){
+         if (isBelowNF){
             sb.append(EdgeConvertFileParser.DELIM);
          }
       }
       sb.append("\r\nRelatedTables: ");
       for (int i = 0; i < this.relatedTables.length; i++) {
+         final boolean isBelowRT = i < (this.relatedTables.length - 1);
          sb.append(this.relatedTables[i]);
-         if (i < (this.relatedTables.length - 1)){
+         if (isBelowRT){
             sb.append(EdgeConvertFileParser.DELIM);
          }
       }
       sb.append("\r\nRelatedFields: ");
       for (int i = 0; i < this.relatedFields.length; i++) {
+         final boolean isBelowRF = i < (this.relatedFields.length - 1);
          sb.append(this.relatedFields[i]);
-         if (i < (this.relatedFields.length - 1)){
+         if (isBelowRF){
             sb.append(EdgeConvertFileParser.DELIM);
          }
       }
