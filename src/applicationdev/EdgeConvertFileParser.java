@@ -68,15 +68,16 @@ public class EdgeConvertFileParser {
                style = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")); //get the Style parameter
                final boolean isARelation = style.startsWith("Relation");
                final boolean isAEntity = style.startsWith("Entity");
+               final boolean isAnAttribute = style.startsWith("Attribute");
                if (isARelation) { //presence of Relations implies lack of normalization
                   JOptionPane.showMessageDialog(null, "The Edge Diagrammer file\n" + parseFile + "\ncontains relations.  Please resolve them and try again.");
                   EdgeConvertGUI.setReadSuccess(false);
                   break;
                } 
-               if (style.startsWith("Entity")) {
+               if (isAEntity) {
                   isEntity = true;
                }
-               if (style.startsWith("Attribute")) {
+               if (isAnAttribute) {
                   isAttribute = true;
                }
                final boolean isOnlyFigure = !(isEntity || isAttribute);

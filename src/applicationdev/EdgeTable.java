@@ -10,7 +10,7 @@ import java.util.*;
 /*********************************************************************/
 /********* CONSTRUCTOR ***********************************************/ 
    /**
-   * takes in a inputString and sets the appropiate values 
+   * Takes in a inputString and sets the appropriate values 
    * @param inputString String
    */
    public EdgeTable(String inputString) {
@@ -20,24 +20,24 @@ import java.util.*;
    }//end EdgeTable
 /*********************************************************************/
 /********* ACCESSORS *************************************************/       
-  /**
-  * Gets the num figure
-  * @return this.numFigure int */
-  public int getNumFigure() { return this.numFigure; }//end getNumFigure
    /**
-   * gets the name
+   * Gets the num figure
+   * @return this.numFigure int */
+   public int getNumFigure() { return this.numFigure; }//end getNumFigure
+   /**
+   * Gets the name
    * @return this.name String */
    public String getName() { return name; }//end getName
    /**
-   * gets all of the related tables from the array list
+   * Gets all of the related tables from the array list
    * @return this.relatedTables int[] */
    public int[] getRelatedTablesArray() { return this.relatedTables; }//end getRelatedTablesArray
    /**
-   * gets all the related fields from the array list
+   * Gets all the related fields from the array list
    * @return this.relatedFields int[] */
    public int[] getRelatedFieldsArray() { return this.relatedFields; }//end getRelatedFieldsArray
    /**
-   * gets the native fields from the array list
+   * Gets the native fields from the array list
    * @return this.nativeFields int[] */
    public int[] getNativeFieldsArray() { return this.nativeFields; }//end getNativeFieldsArray
 
@@ -51,13 +51,13 @@ import java.util.*;
 /*********************************************************************/
 /********* METHODS ***************************************************/  
    /**
-   * adds the related table to the array list of relatedTables
+   * Adds the related table to the array list of relatedTables
    * @param relatedTable int
    */
    public void addRelatedTable(int relatedTable) { this.alRelatedTables.add(new Integer(relatedTable));  }//end addRelatedTable
    
    /**
-   * adds the native field 
+   * Adds the native field 
    * @param value int
    */
    public void addNativeField(int value) { this.alNativeFields.add(new Integer(value)); }//end addNativeField
@@ -97,7 +97,7 @@ import java.util.*;
    }//end moveFieldDown
 	
    /**
-   * convert the ArrayLists into int[]
+   * Convert the ArrayLists into int[]
    */
    public void makeArrays() { 
       Integer[] temp;
@@ -119,10 +119,10 @@ import java.util.*;
       }
    }//end makeArrays
 
-	/**
-	* converts the attributes in the class into a string
-	* @return String
-	*/
+   /**
+   * Converts the attributes in the class into a string
+   * @return String
+   */
    public String toString() {
       StringBuffer sb = new StringBuffer();
       sb.append("Table: " + numFigure + "\r\n");

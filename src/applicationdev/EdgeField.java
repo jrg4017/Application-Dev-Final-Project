@@ -13,7 +13,7 @@ public class EdgeField {
 /*********************************************************************/
 /********* CONSTRUCTOR ***********************************************/    
    /**
-   * receive the input string and set the appropiate variables
+   * receive the input string and set the appropriate variables
    */
    public EdgeField(String inputString) {
       StringTokenizer st = new StringTokenizer(inputString, EdgeConvertFileParser.DELIM);
