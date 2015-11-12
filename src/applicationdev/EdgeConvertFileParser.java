@@ -3,7 +3,6 @@ import java.util.*;
 import javax.swing.*;
 
 public class EdgeConvertFileParser {
-	//TODO are any of these local varaiables? Can we make them local?? --> better code
 /*********************************************************************/
 /********* ATTRIBUTES ************************************************/
    private File parseFile;											 //
@@ -77,15 +76,27 @@ public class EdgeConvertFileParser {
       return rtnStr;
    }//end trimLine
 
-    public void isRelation(){
-        JOptionPane.showMessageDialog(null, "The Edge Diagrammer file\n" + parseFile + "\ncontains relations.  Please resolve them and try again.");
-        EdgeConvertGUI.setReadSuccess(false);
-    }
-    public void isBlank(){
-        JOptionPane.showMessageDialog(null, "There are entities or attributes with blank names in this diagram.\nPlease provide names for them and try again.");
-        EdgeConvertGUI.setReadSuccess(false);
-    }
+    /**
+     * If it's a relation, print error to get user to normalize it
+     * @param style
+     */
+    public void isRelation(String style){
+        if(style.startsWith("Relation")) {
+            JOptionPane.showMessageDialog(null, "The Edge Diagrammer file\n" + parseFile + "\ncontains relations.  Please resolve them and try again.");
+            EdgeConvertGUI.setReadSuccess(false);
+        }
+    }//end isRelations
 
+    /**
+     * checks to see if text is blank and print out error
+     * @param text
+     */
+    public void isBlank(String text) {
+        if (text.equals("")) {
+            JOptionPane.showMessageDialog(null, "There are entities or attributes with blank names in this diagram.\nPlease provide names for them and try again.");
+            EdgeConvertGUI.setReadSuccess(false);
+        }
+    }//end isBlank
 
     public boolean lookForUnderlined() throws IOException {
         do { //advance to end of record, look for whether the text is underlined
@@ -99,26 +110,49 @@ public class EdgeConvertFileParser {
         return false;
     }
 
+    /**
+     * if a duplicate, print error
+     * if an entity, create an EdgeTable object and add to alTables
+     * @param text
+     */
     public void isEntity(String text){
         if (isTableDup(text)) {
             JOptionPane.showMessageDialog(null, "There are multiple tables called " + text + " in this diagram.\nPlease rename all but one of them and try again.");
             EdgeConvertGUI.setReadSuccess(false);
         }
         alTables.add(new EdgeTable(numFigure + DELIM + text));
-    }
+    }//end isEntity
 
+    /**
+     * if an attribute, create a EdgeField object and add to alField
+     * @param text
+     * @param isUnderlined
+     */
     public void isAttribute(String text, boolean isUnderlined){
         EdgeField tempField = new EdgeField(numFigure + DELIM + text);
         tempField.setIsPrimaryKey(isUnderlined);
         alFields.add(tempField);
-    }
+    }//end isAttribute
+
+    /**
+     * looks to see if the escape is greater than zero
+     * @param text
+     * @param escape
+     * @return String
+     */
+    public String isEAboveZero(String text, int escape){
+        if (escape > 0) {
+            return text.substring(0, escape); //Edge denotes a line break as "\line", disregard anything after a backslash
+        }
+        return text;
+    }//end isEAboveZero
     
    
     /**
     * if it is a figure, check to see what is entity, relation, attribute, etc
     */
    public void isFigure() throws IOException{
-       boolean isRelation = false, isEntity = false, isAttribute = false,  isUnderlined = false;       // all set to false when object is created
+       boolean isEntity = false, isAttribute = false,  isUnderlined = false;       // all set to false when object is created
 
        numFigure = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Figure number
        currentLine = trimLine(2); // this should be "{
@@ -128,32 +162,24 @@ public class EdgeConvertFileParser {
        if (!isNStyle) { // this is to weed out other Figures, like Labels, if it's isNStyle (therefore !N
             String style = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")); //get the Style parameter
 
-           final boolean isARelation = style.startsWith("Relation");
            final boolean isAEntity = style.startsWith("Entity");
            final boolean isAnAttribute = style.startsWith("Attribute");
 
-           if (isARelation) isRelation(); //presence of Relations implies lack of normalization
+           isRelation(style); //presence of Relations implies lack of normalization
            if (isAEntity) isEntity = true;
            if (isAnAttribute) isAttribute = true;
 
-//           final boolean isOnlyFigure = !(isEntity || isAttribute);
-//           //TODO figure how to handle this
-//            if (isOnlyFigure) continue; //these are the only Figures we're interested in
-
            currentLine = trimLine(1); //this should be Text
            String text = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")).replaceAll(" ", ""); //get the Text parameter
-           final boolean isBlank = text.equals("");
-           if (isBlank) isBlank();
 
-            int escape = text.indexOf("\\");
-           final boolean isEAboveZero = escape > 0;
+           isBlank(text);
 
-           if (isEAboveZero) text = text.substring(0, escape); //Edge denotes a line break as "\line", disregard anything after a backslash
+           int escape = text.indexOf("\\");
+           text = isEAboveZero(text, escape);
 
            isUnderlined = lookForUnderlined();
 
            if (isEntity) isEntity(text); //create a new EdgeTable object and add it to the alTables ArrayList
-
            if (isAttribute) isAttribute(text, isUnderlined); //create a new EdgeField object and add it to the alFields ArrayList
          }
    }//end isFigure
@@ -162,11 +188,11 @@ public class EdgeConvertFileParser {
       //this is the start of a Connector entry
          String endStyle1, endStyle2;
          int endPoint1, endPoint2;
-         numConnector = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Connector number
+         numConnector = parseInt(); //get the Connector number
          currentLine = trimLine(3); // this should be "{"; not interested in Style; Figure1
-         endPoint1 = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1));
+         endPoint1 = parseInt();
          currentLine = trimLine(1); // Figure2
-         endPoint2 = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1));
+         endPoint2 = parseInt();
          currentLine = trimLine(5); // not interested in EndPoint1,EndPoint2,SuppressEnd1,SuppressEnd2, and End1
          endStyle1 = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")); //get the End1 parameter
          currentLine = trimLine(1); // End2
@@ -179,8 +205,14 @@ public class EdgeConvertFileParser {
          alConnectors.add(new EdgeConnector(numConnector + DELIM + endPoint1 + DELIM + endPoint2 + DELIM + endStyle1 + DELIM + endStyle2));
      // if("Connector")
    }//end is Connector
-   
-   
+
+    /**
+     * returns the int of the substring that is grabbed
+     * @return
+     */
+   public int parseInt(){
+       return Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1));
+   }
    
    /**
    * identify nature of Connector endpoints
