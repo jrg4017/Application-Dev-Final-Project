@@ -112,7 +112,8 @@ public class EdgeConvertFileParser {
         tempField.setIsPrimaryKey(isUnderlined);
         alFields.add(tempField);
     }
-
+    
+   
     /**
     * if it is a figure, check to see what is entity, relation, attribute, etc
     */
@@ -178,7 +179,9 @@ public class EdgeConvertFileParser {
          alConnectors.add(new EdgeConnector(numConnector + DELIM + endPoint1 + DELIM + endPoint2 + DELIM + endStyle1 + DELIM + endStyle2));
      // if("Connector")
    }//end is Connector
-
+   
+   
+   
    /**
    * identify nature of Connector endpoints
    */
@@ -192,25 +195,21 @@ public class EdgeConvertFileParser {
          fieldIndex = -1;
          for (int fIndex = 0; fIndex < fields.length; fIndex++) { //search fields array for endpoints
           //Simplifying a complex expression
-         final boolean isEqualF1 = endPoint1 == fields[fIndex].getNumFigure();
-         final boolean isEqualF2 = endPoint2 == fields[fIndex].getNumFigure();
-            if (isEqualF1) { //found endPoint1 in fields array
+            if (endPoint1 == fields[fIndex].getNumFigure()) { //found endPoint1 in fields array
                connectors[cIndex].setIsEP1Field(true); //set appropriate flag
                fieldIndex = fIndex; //identify which element of the fields array that endPoint1 was found in
             }
-            if (isEqualF2) { //found endPoint2 in fields array
+            if (endPoint2 == fields[fIndex].getNumFigure()) { //found endPoint2 in fields array
                connectors[cIndex].setIsEP2Field(true); //set appropriate flag
                fieldIndex = fIndex; //identify which element of the fields array that endPoint2 was found in
             }
          }
          for (int tIndex = 0; tIndex < tables.length; tIndex++) { //search tables array for endpoints
-            final boolean isEqualNF1 = endPoint1 == tables[tIndex].getNumFigure();
-            final boolean isEqualNF2 = endPoint2 == tables[tIndex].getNumFigure();
-            if (isEqualNF1) { //found endPoint1 in tables array
+            if (endPoint1 == tables[tIndex].getNumFigure()) { //found endPoint1 in tables array
                connectors[cIndex].setIsEP1Table(true); //set appropriate flag
                table1Index = tIndex; //identify which element of the tables array that endPoint1 was found in
             }
-            if (isEqualNF2) { //found endPoint1 in tables array
+            if (endPoint2 == tables[tIndex].getNumFigure()) { //found endPoint1 in tables array
                connectors[cIndex].setIsEP2Table(true); //set appropriate flag
                table2Index = tIndex; //identify which element of the tables array that endPoint2 was found in
             }
@@ -218,6 +217,7 @@ public class EdgeConvertFileParser {
 
          final boolean isField = connectors[cIndex].getIsEP1Field() && connectors[cIndex].getIsEP2Field();
          final boolean isTable = connectors[cIndex].getIsEP1Table() && connectors[cIndex].getIsEP2Table();
+         
          if (isField) { //both endpoints are fields, implies lack of normalization
             JOptionPane.showMessageDialog(null, "The Edge Diagrammer file\n" + parseFile + "\ncontains composite attributes. Please resolve them and try again.");
             EdgeConvertGUI.setReadSuccess(false); //this tells GUI not to populate JList components
@@ -262,13 +262,11 @@ public class EdgeConvertFileParser {
    */
    //TODO clean up code, refactor, fix "shoulds" into "does"
    public void parseSaveFile() throws IOException {
-      StringTokenizer stTables, stNatFields, stRelFields, stNatRelFields, stField;
+      StringTokenizer stTables, stNatFields, stRelFields, stNatRelFields;
       EdgeTable tempTable;
-      EdgeField tempField;
       currentLine = br.readLine();
       currentLine = br.readLine(); //this should be "Table: "
-      final boolean isTable = currentLine.startsWith("Table: ");
-      while (isTable) {
+      while (currentLine.startsWith("Table: ")) {
          numFigure = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Table number
          currentLine = br.readLine(); //this should be "{"
          currentLine = br.readLine(); //this should be "TableName"
@@ -303,8 +301,17 @@ public class EdgeConvertFileParser {
          currentLine = br.readLine(); //this should be "\n"
          currentLine = br.readLine(); //this should be either the next "Table: ", #Fields#
       }
-      final boolean isNotNull = (currentLine = br.readLine()) != null;
-      while (isNotNull) {
+      addFieldAttributes((currentLine = br.readLine()) != null);
+   } // end parseSaveFile
+      
+   /**
+   * Adds field attributes to field 
+   * Adds field to ArrayList alFields
+   */
+   private void addFieldAttributes(boolean isNotNull) {
+        EdgeField tempField;
+        StringTokenizer stField;
+        while (isNotNull) {
          stField = new StringTokenizer(currentLine, DELIM);
          numFigure = Integer.parseInt(stField.nextToken());
          String fieldName = stField.nextToken();
@@ -321,18 +328,16 @@ public class EdgeConvertFileParser {
          }
          alFields.add(tempField);
       }
-   } // end parseSaveFile
+   }
 
    /**
    * convert ArrayList objects into arrays of the appropriate Class type
    */
    private void makeArrays() {
 	//TODO clean the finals up!! messy and improper code
-      final boolean isNotNullTable = alTables != null, isNotNullField = alFields != null, isNotNullConnector = alConnectors != null;
-
-      if (isNotNullTable) tables = (EdgeTable[])alTables.toArray(new EdgeTable[alTables.size()]);
-      if (isNotNullField) fields = (EdgeField[])alFields.toArray(new EdgeField[alFields.size()]);
-      if (isNotNullConnector) connectors = (EdgeConnector[])alConnectors.toArray(new EdgeConnector[alConnectors.size()]);
+      if (alTables != null) tables = (EdgeTable[])alTables.toArray(new EdgeTable[alTables.size()]);
+      if (alFields != null) fields = (EdgeField[])alFields.toArray(new EdgeField[alFields.size()]);
+      if (alConnectors != null) connectors = (EdgeConnector[])alConnectors.toArray(new EdgeConnector[alConnectors.size()]);
 
    }//end makeArray
 
