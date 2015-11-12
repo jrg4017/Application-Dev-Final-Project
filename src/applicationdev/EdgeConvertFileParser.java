@@ -7,18 +7,14 @@ public class EdgeConvertFileParser {
 /*********************************************************************/
 /********* ATTRIBUTES ************************************************/
    private File parseFile;											 //
-   private FileReader fr;											 //
    private BufferedReader br;										 //
    private String currentLine;										 //
    private ArrayList alTables = new ArrayList(), alFields = new ArrayList(), alConnectors = new ArrayList();//when object is constructed, default
    private EdgeTable[] tables;										                  //
    private EdgeField[] fields;										 				  //
-   private EdgeField tempField;										 				  //	
    private EdgeConnector[] connectors;												  //
-   private String style, text, tableName, fieldName, endStyle1, endStyle2;            //
-   private boolean isEntity = false, isAttribute =false,  isUnderlined = false;       // all set to false when object is created 
-   private int numFigure = 0, numConnector = 0, numLine = 0;						  // all set to zero as default when object is constructed
-   private int endPoint1, endPoint2, numFields, numTables, numNativeRelatedFields;    //
+   private int numFigure = 0, numConnector = 0;						  // all set to zero as default when object is constructed
+   private int numNativeRelatedFields;    //not being used
 /*************************************************************************************/
 /********* CONSTANTS *****************************************************************/  
    public static final String EDGE_ID = "EDGE Diagram File"; 						  //first line of .edg files should be this
@@ -28,6 +24,7 @@ public class EdgeConvertFileParser {
 /********* CONSTRUCTORS **********************************************/   
    /**
    * accepts a file, sets it to parseFile and opens the file
+     * @param constructorFile
    */
    public EdgeConvertFileParser(File constructorFile) {
       this.parseFile = constructorFile; 
@@ -55,8 +52,9 @@ public class EdgeConvertFileParser {
    public void parseEdgeFile() throws IOException {
       while ((currentLine = br.readLine()) != null) {
          currentLine = currentLine.trim();
-         final boolean isFigure = currentLine.startsWith("Figure ");
-         final boolean isConnector = currentLine.startsWith("Connector ");
+         final boolean isFigure = currentLine.startsWith("Figure "), isConnector = currentLine.startsWith("Connector ");
+         boolean isEntity = false, isAttribute = false,  isUnderlined = false;       // all set to false when object is created 
+
          if (isFigure) { //this is the start of a Figure entry
             numFigure = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Figure number
             currentLine = br.readLine().trim(); // this should be "{"
@@ -65,7 +63,7 @@ public class EdgeConvertFileParser {
             if (isNStyle) { // this is to weed out other Figures, like Labels
                continue;
             } else {
-               style = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")); //get the Style parameter
+               String style = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")); //get the Style parameter
                final boolean isARelation = style.startsWith("Relation");
                final boolean isAEntity = style.startsWith("Entity");
                final boolean isAnAttribute = style.startsWith("Attribute");
@@ -85,7 +83,7 @@ public class EdgeConvertFileParser {
                   continue;
                }
                currentLine = br.readLine().trim(); //this should be Text
-               text = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")).replaceAll(" ", ""); //get the Text parameter
+               String text = currentLine.substring(currentLine.indexOf("\"") + 1, currentLine.lastIndexOf("\"")).replaceAll(" ", ""); //get the Text parameter
                final boolean isBlank = text.equals("");
                if (isBlank) {
                   JOptionPane.showMessageDialog(null, "There are entities or attributes with blank names in this diagram.\nPlease provide names for them and try again.");
@@ -115,7 +113,7 @@ public class EdgeConvertFileParser {
                   alTables.add(new EdgeTable(numFigure + DELIM + text));
                }
                if (isAttribute) { //create a new EdgeField object and add it to the alFields ArrayList
-                  tempField = new EdgeField(numFigure + DELIM + text);
+                  EdgeField tempField = new EdgeField(numFigure + DELIM + text);
                   tempField.setIsPrimaryKey(isUnderlined);
                   alFields.add(tempField);
                }
@@ -126,6 +124,8 @@ public class EdgeConvertFileParser {
             }
          } // if("Figure")
          if (isConnector) { //this is the start of a Connector entry
+             String endStyle1, endStyle2;
+             int endPoint1, endPoint2;
             numConnector = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Connector number
             currentLine = br.readLine().trim(); // this should be "{"
             currentLine = br.readLine().trim(); // not interested in Style
@@ -244,19 +244,19 @@ public class EdgeConvertFileParser {
          numFigure = Integer.parseInt(currentLine.substring(currentLine.indexOf(" ") + 1)); //get the Table number
          currentLine = br.readLine(); //this should be "{"
          currentLine = br.readLine(); //this should be "TableName"
-         tableName = currentLine.substring(currentLine.indexOf(" ") + 1);
+         String tableName = currentLine.substring(currentLine.indexOf(" ") + 1);
          tempTable = new EdgeTable(numFigure + DELIM + tableName);
          
          currentLine = br.readLine(); //this should be the NativeFields list
          stNatFields = new StringTokenizer(currentLine.substring(currentLine.indexOf(" ") + 1), DELIM);
-         numFields = stNatFields.countTokens();
+         int numFields = stNatFields.countTokens();
          for (int i = 0; i < numFields; i++) {
             tempTable.addNativeField(Integer.parseInt(stNatFields.nextToken()));
          }
          
          currentLine = br.readLine(); //this should be the RelatedTables list
          stTables = new StringTokenizer(currentLine.substring(currentLine.indexOf(" ") + 1), DELIM);
-         numTables = stTables.countTokens();
+         int numTables = stTables.countTokens();
          for (int i = 0; i < numTables; i++) {
             tempTable.addRelatedTable(Integer.parseInt(stTables.nextToken()));
          }
@@ -279,7 +279,7 @@ public class EdgeConvertFileParser {
       while (isNotNull) {
          stField = new StringTokenizer(currentLine, DELIM);
          numFigure = Integer.parseInt(stField.nextToken());
-         fieldName = stField.nextToken();
+         String fieldName = stField.nextToken();
          tempField = new EdgeField(numFigure + DELIM + fieldName);
          tempField.setTableID(Integer.parseInt(stField.nextToken()));
          tempField.setTableBound(Integer.parseInt(stField.nextToken()));
@@ -300,18 +300,12 @@ public class EdgeConvertFileParser {
    */
    private void makeArrays() { 
 	//TODO clean the finals up!! messy and improper code
-      final boolean isNotNullTable = alTables != null;
-      final boolean isNotNullField = alFields != null;
-      final boolean isNotNullConnector = alConnectors != null;
-      if (isNotNullTable) {
-         tables = (EdgeTable[])alTables.toArray(new EdgeTable[alTables.size()]);
-      }
-      if (isNotNullField) {
-         fields = (EdgeField[])alFields.toArray(new EdgeField[alFields.size()]);
-      }
-      if (isNotNullConnector) {
-         connectors = (EdgeConnector[])alConnectors.toArray(new EdgeConnector[alConnectors.size()]);
-      }
+      final boolean isNotNullTable = alTables != null, isNotNullField = alFields != null, isNotNullConnector = alConnectors != null;
+      
+      if (isNotNullTable) tables = (EdgeTable[])alTables.toArray(new EdgeTable[alTables.size()]);
+      if (isNotNullField) fields = (EdgeField[])alFields.toArray(new EdgeField[alFields.size()]);
+      if (isNotNullConnector) connectors = (EdgeConnector[])alConnectors.toArray(new EdgeConnector[alConnectors.size()]);
+      
    }//end makeArray
    
    /**
@@ -335,8 +329,9 @@ public class EdgeConvertFileParser {
    * @param inputFile File
    */
    public void openFile(File inputFile) {
+     int numLine = 0;
       try {
-         fr = new FileReader(inputFile);
+         FileReader fr = new FileReader(inputFile);
          br = new BufferedReader(fr);
          //test for what kind of file we have
          currentLine = br.readLine().trim();
