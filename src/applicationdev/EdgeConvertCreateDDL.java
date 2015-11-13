@@ -14,7 +14,9 @@ public abstract class EdgeConvertCreateDDL {
    protected int[] numBoundTables;									  //
    protected int maxBound;											  //
    protected StringBuffer sb;										  //
-   protected int selected;											  //
+   protected int selected;				
+   protected enum productNames { MySQL, SqlServer };
+//
 /*********************************************************************/
 /********* CONSTRUCTORS **********************************************/  
    /**
