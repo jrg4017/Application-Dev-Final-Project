@@ -34,7 +34,11 @@ public class CreateDDLSqlServer extends EdgeConvertCreateDDL {
 
     @Override
     public void createDDL() {
-
+       EdgeConvertGUI.setReadSuccess(true);
+       this.databaseName = generateDatabaseName();
+       this.databaseName = generateDatabaseName();
+       this.sb.append("CREATE DATABASE " + this.databaseName + ";\r\n");
+       this.sb.append("USE " + this.databaseName + ";\r\n");
     }
     
     /**
