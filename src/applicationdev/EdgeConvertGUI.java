@@ -1174,7 +1174,7 @@ public class EdgeConvertGUI {
       }
    }//end 
    
-   //TODO extract class into a new files
+
    class EdgeRadioButtonListener implements ActionListener {
       /**
 	  * @param ae ActionEvent
@@ -1200,7 +1200,7 @@ public class EdgeConvertGUI {
       }//end actionPerformed
    }//end EdgeRadioButtonListener
    
-   //TODO extract class
+
    class EdgeWindowListener implements WindowListener {
       public void windowActivated(WindowEvent we) {}
       public void windowClosed(WindowEvent we) {}
