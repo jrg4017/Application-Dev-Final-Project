@@ -57,7 +57,7 @@ public class CreateDDLMySQL extends EdgeConvertCreateDDL {
    /**
    * creates the DDL (data description language) for the program
    */
-   //TODO REFACTOR THIS! Function to long, needs to divy up into smaller reusable code
+
    public void createDDL() {
       EdgeConvertGUI.setReadSuccess(true);
       this.databaseName = generateDatabaseName();
