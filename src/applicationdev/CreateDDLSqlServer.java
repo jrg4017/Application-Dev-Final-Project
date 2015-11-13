@@ -3,35 +3,60 @@ import javax.swing.JOptionPane;
 
 
 public class CreateDDLSqlServer extends EdgeConvertCreateDDL {
-
+/*********************************************************************/
+/********* ATTRIBUTES ************************************************/
     protected String databaseName;                                            //the name of databases
-    protected String[] strDataType = {"VARCHAR", "BOOL", "INT", "DOUBLE"};    //this array is for determining how MySQL refers to datatypes
+    protected String[] strDataType = {"VARCHAR", "BOOL", "INT", "DOUBLE"};    //this array is for determining how SQL refers to datatypes
     protected StringBuffer sb;
-
-    public CreateDDLSqlServer() {
-    }
-
+/*********************************************************************/
+/********* CONSTRUCTORS **********************************************/
+   /**
+   * default constructor with empty arg list for to allow output dir to be set before there are table and field objects
+   */
+    public CreateDDLSqlServer() { } //end default constructor
+    
+   /**
+   * constructor 
+   * @param inputTables EdgeTable[]
+   * @param inputFields EdgeTable[]
+   */
     public CreateDDLSqlServer(EdgeTable[] inputTables, EdgeField[] inputFields) {
         super(inputTables, inputFields); //call EdgeConvert supers
         this.sb = new StringBuffer();
-    }
+    } //end CreateDDLSqlServer
 
+/*********************************************************************/
+/********* ACCESSORS *************************************************/   
+   /**
+   * gets the database name
+   * @return this.databaseName
+   */
     @Override
-    public String getDatabaseName() {
-        return this.databaseName;
-    }
+    public String getDatabaseName() { return this.databaseName; } //end getDatabaseName()
 
+   /**
+   * gets the product name
+   * @return string
+   */
     @Override
-    public String getProductName() {
-        return productNames.SqlServer.toString();
-    }
-
+    public String getProductName() { return productNames.SqlServer.toString(); } //end getProductName()
+    
+ /**
+   * creates the DDL & then get the SQL string generated
+   * @return string
+   */
     @Override
     public String getSQLString() {
         createDDL();
         return this.sb.toString();
-    }
+    } //end getSQLString()
 
+/*********************************************************************/
+/********* METHODS ***************************************************/
+
+   /**
+   * creates the DDL (data description language) for the program
+   */
     @Override
     public void createDDL() {
        EdgeConvertGUI.setReadSuccess(true);
@@ -39,7 +64,7 @@ public class CreateDDLSqlServer extends EdgeConvertCreateDDL {
        this.databaseName = generateDatabaseName();
        this.sb.append("CREATE DATABASE " + this.databaseName + ";\r\n");
        this.sb.append("USE " + this.databaseName + ";\r\n");
-    }
+    } //end createDDL
     
     /**
      * converts a String boolean used in SqlServer to an int SqlServer uses '1' and '0'
@@ -81,4 +106,4 @@ public class CreateDDLSqlServer extends EdgeConvertCreateDDL {
       } while (this.databaseName.equals(""));
       return this.databaseName;
    }//end generateDatabaseName
-}
+}///end CreateDDLSqlServer
