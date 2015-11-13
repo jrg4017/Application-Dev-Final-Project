@@ -14,9 +14,8 @@ public abstract class EdgeConvertCreateDDL {
    protected int[] numBoundTables;									  //
    protected int maxBound;											  //
    protected StringBuffer sb;										  //
-   protected int selected;				
+   protected int selected;	
    protected enum productNames { MySQL, SqlServer };
-//
 /*********************************************************************/
 /********* CONSTRUCTORS **********************************************/  
    /**
@@ -101,5 +100,9 @@ public abstract class EdgeConvertCreateDDL {
    public abstract String getSQLString();
    
    public abstract void createDDL();
+   
+   public abstract String generateDatabaseName();
+   
+   protected abstract int convertStrBooleanToInt(String input);
    
 }//EdgeConvertCreateDDL
