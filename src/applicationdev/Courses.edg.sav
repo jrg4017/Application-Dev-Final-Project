@@ -28,7 +28,7 @@ RelatedFields: 0|0
 3|Grade|13|0|0|0|1|false|false|
 4|CourseName|0|0|0|0|1|false|false|
 5|Number|13|0|0|0|1|false|false|
-6|FacSSN|2|0|0|0|9|true|true|
-7|StudentSSN|1|0|0|0|1|true|false|
+6|FacSSN|2|0|0|0|66|false|false|
+7|StudentSSN|1|0|0|0|1|false|false|
 8|StudentName|1|0|0|0|1|false|false|
 11|FacultyName|2|0|0|0|1|false|false|
