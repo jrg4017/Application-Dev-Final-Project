@@ -226,7 +226,7 @@ public class EdgeConvertFileParser {
    /**
    * identify nature of Connector endpoints
    */
-   //TODO refactor into smaller reusable functions
+
    private void resolveConnectors() {
       int endPoint1, endPoint2;
       int fieldIndex = 0, table1Index = 0, table2Index = 0;
@@ -301,27 +301,27 @@ public class EdgeConvertFileParser {
    * parse the save file of the edge
    * @throws IOException
    */
-   //TODO clean up code, refactor, fix "shoulds" into "does"
+
    public void parseSaveFile() throws IOException {
       StringTokenizer stTables, stNatFields, stRelFields, stNatRelFields;
       EdgeTable tempTable;
       currentLine = br.readLine();
-      currentLine = br.readLine(); //this should be "Table: "
+      currentLine = br.readLine(); 
       while (currentLine.startsWith("Table: ")) {
          numFigure = parseInt(); //get the Table number
-         currentLine = br.readLine(); //this should be "{"
-         currentLine = br.readLine(); //this should be "TableName"
+         currentLine = br.readLine(); 
+         currentLine = br.readLine(); 
          String tableName = subString(" ","");
          tempTable = new EdgeTable(numFigure + DELIM + tableName);
 
-         currentLine = br.readLine(); //this should be the NativeFields list
+         currentLine = br.readLine(); 
          stNatFields = new StringTokenizer(subString(" ", ""), DELIM);
          int numFields = stNatFields.countTokens();
          for (int i = 0; i < numFields; i++) {
             tempTable.addNativeField(Integer.parseInt(stNatFields.nextToken()));
          }
 
-         currentLine = br.readLine(); //this should be the RelatedTables list
+         currentLine = br.readLine(); 
          stTables = new StringTokenizer(subString(" ",""), DELIM);
          int numTables = stTables.countTokens();
          for (int i = 0; i < numTables; i++) {
@@ -338,9 +338,9 @@ public class EdgeConvertFileParser {
          }
 
          alTables.add(tempTable);
-         currentLine = br.readLine(); //this should be "}"
-         currentLine = br.readLine(); //this should be "\n"
-         currentLine = br.readLine(); //this should be either the next "Table: ", #Fields#
+         currentLine = br.readLine();
+         currentLine = br.readLine(); 
+         currentLine = br.readLine();
       }
       addFieldAttributes((currentLine = br.readLine()) != null);
    } // end parseSaveFile
