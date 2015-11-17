@@ -170,6 +170,7 @@ public class EdgeConvertGUI {
       jpDTBottom = new JPanel(new GridLayout(1, 2));
 
       jbDTCreateDDL = new JButton("Create DDL");
+      jbDTCreateDDL.setToolTipText("Data Definition Language");
       jbDTCreateDDL.setEnabled(false);
       jbDTCreateDDL.addActionListener(createDDLListener);
 
